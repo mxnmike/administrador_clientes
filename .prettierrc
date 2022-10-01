@@ -4,5 +4,6 @@
     "arrowParens": "avoid",
     "jsxSingleQuote": true,
    "jsxIgnoreLineBreak": true,
-   "singleAttributePerLine": true
+   "singleAttributePerLine": true,
+   "bracketSpacing": true
 }

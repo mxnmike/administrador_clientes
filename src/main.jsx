@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom/client'
 import './index.css'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Layout from './components/Layout'
+import NewClient, { action as newClientAction } from './pages/NewClient'
+import Index, { loader as clientsLoader } from './pages/Index'
 
 const router = createBrowserRouter([
   {
@@ -10,8 +12,14 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       {
-        path: '/nosotros',
-        element: <h1>Nosotros</h1>,
+        index: true,
+        element: <Index />,
+        loader: clientsLoader,
+      },
+      {
+        path: '/clients/new',
+        element: <NewClient />,
+        action: newClientAction,
       },
     ],
   },

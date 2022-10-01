@@ -1,9 +1,26 @@
-import { useNavigate, Form, useActionData, redirect } from 'react-router-dom'
+import {
+  useNavigate,
+  Form,
+  useLoaderData,
+  useActionData,
+  redirect,
+} from 'react-router-dom'
+import { obtenerCliente, actualizarCliente } from '../data/clientes'
 import Formulario from '../components/Formulario'
 import Error from '../components/Error'
-import { agregarCliente } from '../data/clientes'
 
-export async function action({ request }) {
+export async function loader({ params }) {
+  const cliente = await obtenerCliente(params.clientId)
+  if (Object.values(cliente).length === 0) {
+    throw new Response('', {
+      status: 404,
+      statusText: 'No Hay Resultados',
+    })
+  }
+  return cliente
+}
+
+export async function action({ request, params }) {
   const formData = await request.formData()
   const datos = Object.fromEntries(formData)
   const email = datos.email
@@ -23,24 +40,22 @@ export async function action({ request }) {
 
   //return datos si hay errores
   if (Object.keys(errores).length) {
-    console.log('si hay errores')
     return errores
   }
-  await agregarCliente(datos)
+  //Actualizar clientes
+  await actualizarCliente(params.clientId, datos)
   return redirect('/')
 }
 
-function NewClient() {
+function EditarCliente() {
   const navigate = useNavigate()
+  const cliente = useLoaderData()
   const errores = useActionData()
 
-  console.log(errores)
   return (
     <>
-      <h1 className='font-black text-4xl text-blue-900'>Nuevo Cliente</h1>
-      <p className='mt-3'>
-        Llena todos los campos para registrar un nuevo cliente
-      </p>
+      <h1 className='font-black text-4xl text-blue-900'>Editar Cliente</h1>
+      <p className='mt-3'>Modifica los campos deseados del cliente</p>
 
       <div className='flex justify-end'>
         <button
@@ -58,11 +73,11 @@ function NewClient() {
           method='post'
           noValidate
         >
-          <Formulario />
+          <Formulario cliente={cliente} />
           <input
             type='submit'
             className='mt-5 w-full bg-blue-800 p-3 uppercase font-bold text-white text-lg'
-            value='Registrar Cliente'
+            value='Guardar Cambios'
           />
         </Form>
       </div>
@@ -70,4 +85,4 @@ function NewClient() {
   )
 }
 
-export default NewClient
+export default EditarCliente
